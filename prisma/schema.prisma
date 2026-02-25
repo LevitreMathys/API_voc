@@ -5,8 +5,8 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-    provider = "prisma-client"
-    output   = "../src/generated"
+    provider     = "prisma-client"
+    output       = "../src/generated"
     moduleFormat = "commonjs"
 }
 
@@ -14,9 +14,38 @@ datasource db {
     provider = "postgresql"
 }
 
+
 model User {
-    id       Int    @id @default(autoincrement())
-    pseudo   String @unique
-    email    String @unique
-    password String
+    id            Int            @id @default(autoincrement())
+    pseudo        String         @unique
+    email         String         @unique
+    password      String
+    conversations Conversation[] @relation("actualUser")
+    friendOf      Conversation[] @relation("friendUser")
+}
+
+model Message {
+    id           Int        @id @default(autoincrement())
+    content      String
+    createdAt    DateTime   @default(now())
+    convMessages ConvMess[]
+}
+
+model Conversation {
+    id           Int        @id @default(autoincrement())
+    name         String
+    createdAt    DateTime   @default(now())
+    actualUserId Int
+    friendUserId Int
+    actualUser   User       @relation("actualUser", fields: [actualUserId], references: [id])
+    friendUser   User       @relation("friendUser", fields: [friendUserId], references: [id])
+    messages     ConvMess[]
+}
+
+model ConvMess {
+    id           Int          @id @default(autoincrement())
+    convId       Int
+    messId       Int
+    conversation Conversation @relation(fields: [convId], references: [id])
+    message      Message      @relation(fields: [messId], references: [id])
 }
