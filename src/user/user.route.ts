@@ -15,6 +15,13 @@ userRouter.get('/', async (req: Request, res: Response) => {
 userRouter.post('/create', async (req: Request, res: Response) => {
     try {
         const { pseudo, email, password } = req.body;
+
+        if (!pseudo | !email | !password) {
+            return res.status(400).json({
+                error: "[ERREUR] Information(s) manquante(s) ou invalide(s)"
+            });
+        }
+
         const newUser = await prisma.user.create({
             data: {
                 pseudo,
